@@ -2,12 +2,25 @@ from fastapi import FastAPI
 from random import randint
 from typing import Optional
 from pydantic import BaseModel
+import pandas as pd
+
+# TODO plan times hardcodeados
+plantime_df = pd.DataFrame()
+plantime_df['aniocampana'] = ['202101', '202101', '202101']
+plantime_df['codpais'] = ['PE', 'CO', 'PR']
+plantime_df['plantime'] = [5, 4, 3]
+
 
 class Product(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
     stock: Optional[int] = 0
+
+class PlanTime(BaseModel):
+    aniocampana: str
+    codpais: str
+    plantime: Optional[int] = -1
 
 app = FastAPI()
 
@@ -27,10 +40,29 @@ async def read_item_id(item_name):
 async def read_product_id(product_id: int):
     return {"item_id": product_id}
 
+# Order matters (URL)
 @app.get("/items/airpods")
 async def read_airpods_id():
     return {"item_id": 2244}
 
+# POST method with self-designed objects
 @app.post("/product/")
 async def create_item(product: Product):
+    product.name = product.name.capitalize()
     return product
+
+# Path parameters & request body
+@app.post("/product/{product_id}")
+async def create_product(product_id: int, product: Product):
+    response = vars(product)
+    response.update({'product_id': product_id})
+    return response
+
+# Belcorp example
+@app.get("/plantime/{aniocampana}/{codpais}")
+async def get_plantime(aniocampana: str, codpais: str):
+    response = dict()
+    response['aniocampana'] = aniocampana
+    response['codpais'] = codpais
+    response['plantime'] = plantime_df[(plantime_df['aniocampana']==aniocampana) & (plantime_df['codpais']==codpais)]['plantime'].values[0]
+    return response
