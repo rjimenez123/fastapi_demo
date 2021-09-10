@@ -5,6 +5,7 @@ from random import randint
 from typing import Optional
 from pydantic import BaseModel
 import pandas as pd
+import json
 
 # TODO plan times hardcodeados
 plantime_df = pd.DataFrame()
