@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+# uvicorn main:app --reload
+
+from fastapi import FastAPI, HTTPException
 from random import randint
 from typing import Optional
 from pydantic import BaseModel
@@ -61,8 +63,15 @@ async def create_product(product_id: int, product: Product):
 # Belcorp example
 @app.get("/plantime/{aniocampana}/{codpais}")
 async def get_plantime(aniocampana: str, codpais: str):
+    codpais = codpais.upper()
+
     response = dict()
     response['aniocampana'] = aniocampana
     response['codpais'] = codpais
-    response['plantime'] = plantime_df[(plantime_df['aniocampana']==aniocampana) & (plantime_df['codpais']==codpais)]['plantime'].values[0]
+
+    sub_df = plantime_df[(plantime_df['aniocampana']==aniocampana) & (plantime_df['codpais']==codpais)]
+    if len(sub_df) == 0:
+        raise HTTPException(status_code=404, detail=f"Plantime not found for {aniocampana} and {codpais}.")
+
+    response['plantime'] = int(sub_df['plantime'].values[0])
     return response
