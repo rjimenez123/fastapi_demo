@@ -12,7 +12,10 @@ plantime_df['aniocampana'] = ['202101', '202101', '202101']
 plantime_df['codpais'] = ['PE', 'CO', 'PR']
 plantime_df['plantime'] = [5, 4, 3]
 
-
+pt_json = None
+with open('../plan_time_campaign.json', 'r') as outfile:
+    pt_json = json.load(outfile)
+    
 class Product(BaseModel):
     name: str
     description: Optional[str] = None
@@ -69,9 +72,17 @@ async def get_plantime(aniocampana: str, codpais: str):
     response['aniocampana'] = aniocampana
     response['codpais'] = codpais
 
-    sub_df = plantime_df[(plantime_df['aniocampana']==aniocampana) & (plantime_df['codpais']==codpais)]
-    if len(sub_df) == 0:
+    #sub_df = plantime_df[(plantime_df['aniocampana']==aniocampana) & (plantime_df['codpais']==codpais)]
+    #if len(sub_df) == 0:
+    #    raise HTTPException(status_code=404, detail=f"Plantime not found for {aniocampana} and {codpais}.")
+    #response['plantime'] = int(sub_df['plantime'].values[0])
+    
+    pt = -1 
+    try:
+        pt = pt_json[aniocampana][codpais]['plantime']
+    except:
         raise HTTPException(status_code=404, detail=f"Plantime not found for {aniocampana} and {codpais}.")
 
-    response['plantime'] = int(sub_df['plantime'].values[0])
+    response['plantime'] = pt
+    
     return response
