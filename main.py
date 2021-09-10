@@ -82,6 +82,7 @@ async def get_plantime(aniocampana: str, codpais: str):
     try:
         pt = pt_json[aniocampana][codpais]['plantime']
     except:
+        print(pt_json.keys())
         raise HTTPException(status_code=404, detail=f"Plantime not found for {aniocampana} and {codpais}.")
 
     response['plantime'] = pt
