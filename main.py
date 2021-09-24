@@ -1,6 +1,7 @@
 # uvicorn main:app --reload
+# http://127.0.0.1:8000/
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from random import randint
 from typing import Optional
 from pydantic import BaseModel
@@ -34,9 +35,13 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World"}
 
-# @app.get("/items/airpods")
-# async def read_airpods_id():
-#     return {"item_id": 2244}
+# Query parameters: http://127.0.0.1:8000/items/?q=test
+# @app.get("/items/")
+# async def read_items(q: Optional[str] = Query(None, min_length=3, max_length=10)):
+#     results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+#     if q:
+#         results.update({"q": q})
+#     return results
 
 @app.get("/items/{item_name}")
 async def read_item_id(item_name):
